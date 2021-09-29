@@ -20,7 +20,7 @@ public class AbstractEvent {
 
     public AbstractEvent(){
         this.setEventType(this.getClass().getSimpleName());
-        SimpleDateFormat defaultSimpleDateFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+        SimpleDateFormat defaultSimpleDateFormat = new SimpleDateFormat("YYYYMMddHHmmss");
         this.timestamp = defaultSimpleDateFormat.format(new Date());
     }
 
@@ -43,7 +43,7 @@ public class AbstractEvent {
             /**
              * spring streams 방식
              */
-            KafkaProcessor processor = OrderApplication.applicationContext.getBean(KafkaProcessor.class);
+            KafkaProcessor processor = MessageApplication.applicationContext.getBean(KafkaProcessor.class);
             MessageChannel outputChannel = processor.outboundTopic();
 
             outputChannel.send(MessageBuilder

@@ -67,7 +67,7 @@ public class PolicyHandler{
         System.out.println("\n\n"+orderCanceled.getId());
         for (StockDelivery delivery:deliveryList)
         {
-        	System.out.println("\n\n"+orderCanceled.getId());
+        	System.out.println("\n\n@@@@delivery Canceled ->> "+orderCanceled.getId());
             delivery.setDeliveryStatus("delivery Canceled");
             stockDeliveryRepository.save(delivery);
         }

@@ -63,6 +63,8 @@ hystrix:
 api:
   promote:
     url: http://localhost:8083
+  message:
+    url: http://localhost:8085
 ---
 
 spring:
@@ -112,3 +114,5 @@ hystrix:
 api:
   promote:
     url: http://marketing:8080
+  message:
+    url: http://message:8080

@@ -78,27 +78,35 @@ public class StockDelivery {
        // BeanUtils.copyProperties(this, deliveryCompleted);
        // deliveryCompleted.publishAfterCommit();
     	Promote promote = new Promote();
+        Message message = new Message();
+
         promote.setPhoneNo(this.phoneNo); 
         promote.setUserId(this.userId); 
         promote.setUsername(this.userName); 
         promote.setOrderId(this.orderId); 
         promote.setOrderStatus(this.orderStatus); 
         promote.setProductId(this.productId); 
-        System.out.println("\n\npostupdate() : "+this.deliveryStatus +"\n\n");
-        
+
+        message.setPhoneNo(this.phoneNo); 
+        message.setUsername(this.userName); 
+        message.setOrderId(this.orderId); 
+        message.setProductName(this.productName); 
+        message.setProductId(this.productId); 
+
     	if(DELIVERY_CANCELED == this.deliveryStatus) {
         
 	        boolean result = (boolean) ProductdeliveryApplication.applicationContext.getBean(food.delivery.work.external.PromoteService.class).cancelCoupon(promote);
-	    	
-	        if(result){
+	    	boolean result2 = (boolean) ProductdeliveryApplication.applicationContext.getBean(food.delivery.work.external.MessageService.class).cancelMessage(message);
+
+	        if(result && result2){
 	        	System.out.println("----------------");
-	            System.out.println("Coupon Canceled");
+	            System.out.println("Coupon Canceled && Message Canceled");
 	            System.out.println("----------------");
 		       	DeliveryCanceled deliveryCanceled = new DeliveryCanceled();
 		        BeanUtils.copyProperties(this, deliveryCanceled);
 		        deliveryCanceled.publishAfterCommit();
 	        }else {
-	        	throw new RollbackException("Failed during coupon cancel");
+	        	throw new RollbackException("Failed during coupon cancel or message cancel");
 	        }
 	        
         }

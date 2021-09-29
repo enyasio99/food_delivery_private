@@ -115,6 +115,5 @@ public class OrderStatus {
 			this.orderId = orderId;
 		}
         
-        
 
 }

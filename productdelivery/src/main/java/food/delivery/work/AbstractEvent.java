@@ -20,7 +20,7 @@ public class AbstractEvent {
 
     public AbstractEvent(){
         this.setEventType(this.getClass().getSimpleName());
-        SimpleDateFormat defaultSimpleDateFormat = new SimpleDateFormat("YYYYMMddHHmmss");
+        SimpleDateFormat defaultSimpleDateFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
         this.timestamp = defaultSimpleDateFormat.format(new Date());
     }
 

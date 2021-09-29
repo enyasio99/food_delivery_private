@@ -37,7 +37,7 @@ logging:
     org.hibernate.type: trace
     org.springframework.cloud: debug
 server:
-  port: 8084
+  port: 8085
 ---
 
 spring:
@@ -62,7 +62,7 @@ spring:
                   serde: org.apache.kafka.common.serialization.Serdes$StringSerde
       bindings:
         event-in:
-          group: marketing
+          group: message
           destination: eventTopic
           contentType: application/json
         event-out:

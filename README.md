@@ -801,6 +801,7 @@ spring:
 ...생략
 ```
 - DB에 저장된 결과
+![image](https://user-images.githubusercontent.com/60597727/135447926-eb1e3146-93d3-4644-899f-59b5293dafb5.png)
 
 
 # API 게이트웨이

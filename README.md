@@ -142,12 +142,11 @@
 ## Event Stoming 결과
 
 - MSAEz로 모델링한 이벤트스토밍 결과
-https://www.msaez.io/#/storming/7znb05057kPWQo1TAWCkGM0O2LJ3/5843d1078a788a01aa837bc508a68029
+https://www.msaez.io/#/storming/0MMWUdqHaeZClTr5NOawTiqn8rp1/4c0d2945840662a28cfa3dc786bdbe3a
 
 
 ### 이벤트 도출
-
-![1](https://user-images.githubusercontent.com/88864433/133356420-db8f0cf8-a3f6-4d24-8242-e9e739401045.PNG)
+![1](https://user-images.githubusercontent.com/60597727/135461261-a2af25b7-9657-4c24-b7b0-0bb9c20b0cc9.png)
 
 ```
 1차적으로 필요하다고 생각되는 이벤트를 도출하였다 
@@ -155,7 +154,7 @@ https://www.msaez.io/#/storming/7znb05057kPWQo1TAWCkGM0O2LJ3/5843d1078a788a01aa8
 
 ### 부적격 이벤트 탈락
 
-![2](https://user-images.githubusercontent.com/88864433/133356470-ee9c68e5-50c7-45b8-8bf2-15b9ee408036.PNG)
+![2](https://user-images.githubusercontent.com/60597727/135461308-4c54460a-19dd-4958-8294-f89582dcdff9.png)
 
 ```
 - 과정 중 도출된 잘못된 도메인 이벤트들을 걸러내는 작업을 수행함
@@ -163,19 +162,21 @@ https://www.msaez.io/#/storming/7znb05057kPWQo1TAWCkGM0O2LJ3/5843d1078a788a01aa8
 - 주문과 결제는 동시에 이루어진다고 봐서 주문과 결제를 묶음 
 ```
 
-![3](https://user-images.githubusercontent.com/88864433/133356499-0fa6c5d6-b0ae-48a5-8e9c-06a5bac07ea1.PNG)
+![3](https://user-images.githubusercontent.com/60597727/135461354-c03ec745-1515-47d6-b757-6a1b774eebe0.png)
+
 
 ### 액터, 커맨드를 부착하여 읽기 좋게 
 
-![4-3](https://user-images.githubusercontent.com/88864433/133556941-043ef57c-4c55-49cf-9896-e17d5e11bddd.PNG)
+![4](https://user-images.githubusercontent.com/60597727/135462456-b81bd1d3-9faf-4ea3-89aa-666cf7807e1b.png)
+
 
  
 ### 어그리게잇으로 묶기
 
-![5-3](https://user-images.githubusercontent.com/88864433/133556981-a8bfb142-2690-442d-bc92-8d89a3307472.PNG)
+![5](https://user-images.githubusercontent.com/60597727/135462461-2e48f744-801b-48d9-abcc-8bbe4b11064d.png)
  
 ``` 
-- 고객의 주문후 배송팀의 배송관리, 마케팅의 쿠폰관리는 command와 event 들에 의하여 트랜잭션이 유지되어야 하는 단위로 묶어줌
+- 고객의 주문후 배송팀의 배송관리, 마케팅의 쿠폰관리, 메시지팀의 메시지관리는 command와 event 들에 의하여 트랜잭션이 유지되어야 하는 단위로 묶어줌
 ```
 
 ### 바운디드 컨텍스트로 묶기
@@ -184,8 +185,8 @@ https://www.msaez.io/#/storming/7znb05057kPWQo1TAWCkGM0O2LJ3/5843d1078a788a01aa8
  
 ```
 - 도메인 서열 분리 
-    - Core Domain:  order, delivery : 없어서는 안될 핵심 서비스이며, 연간 Up-time SLA 수준을 99.999% 목표, 배포주기는 order의 경우 1주일 1회 미만, delivery의 경우 1개월 1회 미만
-    - Supporting Domain:  marketing : 경쟁력을 내기위한 서비스이며, SLA 수준은 연간 60% 이상 uptime 목표, 배포주기는 각 팀의 자율이나 표준 스프린트 주기가 1주일 이므로 1주일 1회 이상을 기준으로 함
+    - Core Domain:  order, delivery : 본 서비스의 핵심 업무이며, 연간 Up-time SLA 수준을 99.999% 목표, 배포주기는 order의 경우 1주일 1회 미만, delivery의 경우 1개월 1회 미만
+    - Supporting Domain:  marketing, message : 고객관리를 위한 서비스이며, SLA 수준은 연간 60% 이상 uptime 목표, 배포주기는 각 팀의 자율이나 표준 스프린트 주기가 1주일 이므로 1주일 1회 이상을 기준으로 함
 ```
 ### 폴리시 부착
 

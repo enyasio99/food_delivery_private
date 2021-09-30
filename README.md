@@ -807,7 +807,7 @@ spring:
 # API 게이트웨이
 - API GW를 통하여 마이크로 서비스들의 진입점을 통일할 수 있는가?
 
-- gateway서비스 application.yml 설정
+- gateway서비스 application.yml에서 각 마이크로서비스의 URI PATH에 따라 접근이 가능하도록 함
 ```
 ...생략
 spring:
@@ -849,8 +849,8 @@ spring:
 server:
   port: 8080
 ```
-
-Gateway의 application.yml이며, 마이크로서비스들의 진입점을 세팅하여 URI Path에 따라서 각 마이크로서비스로 라우팅되도록 설정되었다.
+- message서비스 8080포트 호출 결과
+![image](https://user-images.githubusercontent.com/60597727/135450138-b47f2eff-c911-446e-b5aa-d885f7157c6c.png)
 
 # 운영
 --

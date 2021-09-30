@@ -1003,18 +1003,27 @@ siege 가용성은 100%을 유지하고 있다.
 
 - kubectl apply -f efs-provisioner-deploy.yml
 ```
-apiVersion: apps/v1
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: efs-provisioner
+
+---
 kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: efs-provisioner
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: efs-provisioner
-      ...
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: efs-provisioner
     spec:
       serviceAccount: efs-provisioner
       containers:
@@ -1022,64 +1031,57 @@ spec:
           image: quay.io/external_storage/efs-provisioner:latest
           env:
             - name: FILE_SYSTEM_ID
-              value: fs-13229953
+              value: fs-5829ad18
             - name: AWS_REGION
               value: ap-southeast-1
             - name: PROVISIONER_NAME
-              value: my-aws.com/aws-efs
+              value: enyasio99.com/aws-efs
           volumeMounts:
             - name: pv-volume
               mountPath: /persistentvolumes
       volumes:
         - name: pv-volume
           nfs:
-            server: fs-13229953.efs.ap-southeast-1.amazonaws.com
+            server: fs-5829ad18.efs.ap-southeast-1.amazonaws.com
             path: /
+```
+- kubectl apply -f rbac.yml
+```
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: efs-provisioner-runner
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+...생략    
+```
+
+- kubectl apply -f storageClass.yml
+```
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: aws-efs
+provisioner: enyasio99.com/aws-efs
 ```
 - kubectl apply -f volume-pvc.yml
 ```
+    kind: PersistentVolumeClaim
 apiVersion: v1
-kind: PersistentVolumeClaim
 metadata:
-  name: aws-efs
-  labels:
-    app: test-pvc
+  name: efs
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "aws-efs"
 spec:
   accessModes:
-  - ReadWriteMany
+    - ReadWriteMany
   resources:
     requests:
       storage: 1Mi
-  storageClassName: aws-efs
-```
-
-- kubectl get pvc
-![pvc_1](https://user-images.githubusercontent.com/88864433/133474884-3f4b8c61-953d-4631-908f-783523d8846c.PNG)
-
-- deployment.yml
-```
-    spec:
-      containers:
-        - name: order
-          image: 879772956301.dkr.ecr.ap-southeast-1.amazonaws.com/order:latest
-          ports:
-            - containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: '/actuator/health'
-              port: 8080
-            initialDelaySeconds: 10
-            timeoutSeconds: 2
-            periodSeconds: 5
-            failureThreshold: 10
-.... 중략
-          volumeMounts:
-          - name: volume
-            mountPath: /logs
-        volumes:
-        - name: volume
-          persistentVolumeClaim:
-            claimName: aws-efs
 ```
 
 - application.yml

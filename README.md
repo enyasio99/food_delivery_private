@@ -759,24 +759,30 @@ public class OrderStatusViewHandler {
 
 
 # 폴리글랏 퍼시스턴스
-- pom.xml
-```
-		<dependency>
-        	<groupId>mysql</groupId>
-        	<artifactId>mysql-connector-java</artifactId>
-        	<scope>provided</scope>
-    	</dependency>
+- 각 마이크로 서비스들이 각자의 저장소 구조를 자율적으로 채택하고 각자의 저장소 유형 (RDB, NoSQL, File System 등)을 선택하여 구현하였는가?
 
-		<dependency>
-		    <groupId>org.javassist</groupId>
-    		<artifactId>javassist</artifactId>
-    		<version>3.25.0-GA</version>
-		</dependency>
+메세지 발송/취소 이력의 경우 고객의 VOC가 발생할 소지가 크기 때문에 mysql DB를 사용해 영구 보관하도록 구현하였다.
+
+- message서비스 pom.xml에 mysql 연결 설정 추가
+```
+...생략
+                <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.25.0-GA</version>
+                </dependency>
+---생략
 ```
 
-application.yml
+- message서비스 application.yml에 mysql DB접속 정보 추가
 ```
-
+...생략
 spring:
   profiles: docker
 
@@ -792,12 +798,9 @@ spring:
     hibernate:
       format_sql: true
       ddl-auto: create
+...생략
 ```
-
-- 각 마이크로 서비스들이 각자의 저장소 구조를 자율적으로 채택하고 각자의 저장소 유형 (RDB, NoSQL, File System 등)을 선택하여 구현하였는가?
-
-H2 DB의 경우 휘발성 데이터의 단점이 있는데, productdelivery 서비스의 경우 타 서비스들의 비해 중요하다고 생각하였다.
-productdelivery는 주문과 쿠폰발행/취소를 중간에서 모두 파악하여 처리해야 되기 때문에 백업,복원기능과 안정성이 장점이 있는 mysql을 선택하여 구현하였다.
+- DB에 저장된 결과
 
 
 # API 게이트웨이

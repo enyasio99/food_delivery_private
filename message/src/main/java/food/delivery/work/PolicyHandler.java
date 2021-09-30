@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -16,6 +18,10 @@ public class PolicyHandler{
 
     @StreamListener(KafkaProcessor.INPUT)
     public void wheneverDeliveryStarted_SendMessage(@Payload DeliveryStarted deliveryStarted){
+
+        Logger logger = LoggerFactory.getLogger(this.getClass());
+
+        logger.debug("@@@@@@@Send Message Start");
 
         if(!deliveryStarted.validate()) return;
 
@@ -36,6 +42,8 @@ public class PolicyHandler{
          System.out.println(deliveryStarted.getOrderId());
 
          MessageRepository.save(message);
+
+         logger.debug("@@@@@@@Send Message END");
 
     }
 

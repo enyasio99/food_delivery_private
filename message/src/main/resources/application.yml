@@ -68,3 +68,9 @@ spring:
         event-out:
           destination: eventTopic
           contentType: application/json
+logging:
+  path: /logs
+  file:
+    max-history: 30
+  level:
+    org.springframework.cloud: debug

@@ -1083,6 +1083,8 @@ spec:
     requests:
       storage: 1Mi
 ```
+- 바운드된 볼륨 상태 확인
+![image](https://user-images.githubusercontent.com/60597727/135402872-28ee91fc-68f9-41bf-9d54-5c18321a1b43.png)
 
 - application.yml
 ```

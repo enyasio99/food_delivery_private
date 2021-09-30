@@ -204,39 +204,41 @@ https://www.msaez.io/#/storming/0MMWUdqHaeZClTr5NOawTiqn8rp1/4c0d2945840662a28cf
  
 ### 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
 
-![주문완료검증](https://user-images.githubusercontent.com/88864433/133361542-bc0225f1-d540-42d8-ab1b-f9de9967e84a.PNG)
+![10](https://user-images.githubusercontent.com/60597727/135471162-124e4e1c-b17d-4cd4-805c-626a875fadaa.png)
 
 ```
 - 고객이 물건을 주문하고 결제한다 (ok)
 - 결제가 완료되면 주문 내역이 배송팀에 전달된다 (ok)
-- 마케팅팀에서 쿠폰을 발행한다 (ok) 
+- 마케팅팀에서 쿠폰을 발행한다 (ok)
+- 메시지팀에서 주문된 문자를 발송한다 (ok)
 - 쿠폰이 발행된 것을 확인하고 배송을 시작한다 (ok)
 ```
-![주문취소검증](https://user-images.githubusercontent.com/88864433/133361562-11bef187-a52e-4948-a429-995d76d4424d.PNG)
+![11](https://user-images.githubusercontent.com/60597727/135471169-bb48efba-4689-438f-9a3d-536514d1ad60.png)
 
 ``` 
-- 고객이 주문을 취소할 수 있다 (ok)
+- 고객이 주문을 취소한다 (ok)
 - 주문을 취소하면 결제도 함께 취소된다 (ok)
 - 주문이 취소되면 배송팀에 전달된다 (ok)
 - 마케팅팀에서 쿠폰발행을 취소한다 (ok)
-- 쿠폰발행이 취소되면 배송팀에서 배송을 취소한다 (ok)
+- 메시지팀에서 취소된 문자를 발송한다 (ok)
+- 쿠폰발행이 취소되고 취소문자가 발송되면 배송팀에서 배송을 취소한다 (ok)
 ```
 
-### 비기능 요구사항에 대한 검증 (5개가 맞는지 검토 필요)
+### 비기능 요구사항에 대한 검증
 
-![비기능적 요구사항2](https://user-images.githubusercontent.com/88864433/133557381-ccd4b060-9193-4c38-a8a2-6cd8f846545a.PNG)
+![12](https://user-images.githubusercontent.com/60597727/135473895-531c3fda-90b0-428b-8a95-b85d4c510a55.png)
 
 ```
-1. [설계/구현]Req/Resp : 쿠폰이 발행된 건에 한하여 배송을 시작한다. 
+1. [설계/구현]Req/Resp : 쿠폰이 발행된 건에 한하여 배송을 시작한다. 취소문자가 발송되어야 배송팀에서 배송을 취소할수 있다
 2. [설계/구현]CQRS : 고객이 주문상태를 확인 가능해야한다.
-3. [설계/구현]Correlation : 주문을 취소하면 -> 쿠폰을 취소하고 -> 배달을 취소 후 주문 상태 변경
-4. [설계/구현]saga : 서비스(상품팀, 상품배송팀, 마케팅팀)는 단일 서비스 내의 데이터를 처리하고, 각자의 이벤트를 발행하면 연관된 서비스에서 이벤트에 반응하여 각자의 데이터를 변경시킨다.
-5. [설계/구현/운영]circuit breaker : 배송 요청 건수가 임계치 이상 발생할 경우 Circuit Breaker 가 발동된다. 
+3. [설계/구현]Correlation : 주문을 취소하면 -> 쿠폰을 취소하고 -> 취소 문자가 발송되고 -> 배달을 취소 후 주문 상태 변경
+4. [설계/구현]saga : 서비스(상품팀, 상품배송팀, 마케팅팀, 메시지팀)는 단일 서비스 내의 데이터를 처리하고, 각자의 이벤트를 발행하면 연관된 서비스에서 이벤트에 반응하여 각자의 데이터를 변경시킨다.
+5. [설계/구현/운영]circuit breaker : 배송 취소가 임계치 이상 발생할 경우 Circuit Breaker 가 발동된다. 
 ``` 
 
 ### 헥사고날 아키텍처 다이어그램 도출 (그림 수정필요없는지 확인 필요)
 
-![분산스트림2](https://user-images.githubusercontent.com/88864433/133557657-451e67e9-400a-477c-af09-2bfd56f9a659.PNG)
+![13](https://user-images.githubusercontent.com/60597727/135475246-5d3cbc7e-83a8-49c1-8ed0-93536642ebee.png)
  
 
 ```
@@ -258,12 +260,15 @@ mvn spring-boot:run
 
 cd marketing
 mvn spring-boot:run 
+
+cd message
+mvn spring-boot:run 
 ```
 
 # DDD의 적용
 - Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 데이터 접근 어댑터를 개발하였는가? 
 
-각 서비스 내에 도출된 핵심 Aggregate Root 객체를 Entity로 선언하였다. (주문(order), 배송(productdelivery), 마케팅(marketing)) 
+각 서비스 내에 도출된 핵심 Aggregate Root 객체를 Entity로 선언하였다. (주문(order), 배송(productdelivery), 마케팅(marketing), 메시지(message)) 
 
 주문 Entity (Order.java) 
 ```

@@ -807,8 +807,9 @@ spring:
 # API 게이트웨이
 - API GW를 통하여 마이크로 서비스들의 진입점을 통일할 수 있는가?
 
-- application.yml
+- gateway서비스 application.yml 설정
 ```
+...생략
 spring:
   profiles: docker
   cloud:
@@ -817,7 +818,7 @@ spring:
         - id: productdelivery
           uri: http://productdelivery:8080
           predicates:
-            - Path=/stockDeliveries/** 
+            - Path=/stockDeliveries/**
         - id: order
           uri: http://order:8080
           predicates:
@@ -829,7 +830,11 @@ spring:
         - id: marketing
           uri: http://marketing:8080
           predicates:
-            - Path=/promotes/** 
+            - Path=/promotes/**
+        - id: message
+          uri: http://message:8080
+          predicates:
+            - Path=/messages/**
       globalcors:
         corsConfigurations:
           '[/**]':

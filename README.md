@@ -181,7 +181,7 @@ https://www.msaez.io/#/storming/0MMWUdqHaeZClTr5NOawTiqn8rp1/4c0d2945840662a28cf
 
 ### 바운디드 컨텍스트로 묶기
 
-![6-3](https://user-images.githubusercontent.com/88864433/133557010-ac6b1c40-82b3-4445-8182-0feb50e4dbfb.PNG)
+![6](https://user-images.githubusercontent.com/60597727/135468185-5561de4d-45bb-417b-a438-046055095833.png)
  
 ```
 - 도메인 서열 분리 
@@ -190,18 +190,17 @@ https://www.msaez.io/#/storming/0MMWUdqHaeZClTr5NOawTiqn8rp1/4c0d2945840662a28cf
 ```
 ### 폴리시 부착
 
-
-![7-3](https://user-images.githubusercontent.com/88864433/133557035-7d121b68-59ee-4816-98bf-35f7fc2bb160.PNG)
+![7](https://user-images.githubusercontent.com/60597727/135468071-320a2b6b-6984-4313-95e0-41206762462d.png)
  
 
 ### 폴리시의 이동과 컨텍스트 맵핑 (점선은 Pub/Sub, 실선은 Req/Resp) 
 
-![8-3](https://user-images.githubusercontent.com/88864433/133557055-ab304be0-37a2-4675-bce0-425281df7301.PNG)
+![8](https://user-images.githubusercontent.com/60597727/135468568-acb1d8c1-5202-4ec2-ab5e-1670d016737f.png)
  
 
 ### 완성된 모형
 
-![모델](https://user-images.githubusercontent.com/88864433/133361343-d99b4182-22ac-4881-aeee-19ae121723b5.PNG)
+![image](https://user-images.githubusercontent.com/60597727/135468919-dce9a46a-d3c2-435d-b654-6a617d365164.png)
  
 ### 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
 

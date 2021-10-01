@@ -270,179 +270,6 @@ mvn spring-boot:run
 
 각 서비스 내에 도출된 핵심 Aggregate Root 객체를 Entity로 선언하였다. (주문(order), 배송(productdelivery), 마케팅(marketing), 메시지(message)) 
 
-주문 Entity (Order.java) 
-```
-@Entity
-@Table(name="Order_table")
-public class Order {
-
-    
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
-    private String username;
-    private String address;
-    private String phoneNo;
-    private String productId;
-    private int qty; //type change
-    private String payStatus;
-    private String userId;
-    private String orderStatus;
-    private Date orderDate;
-    private String productName;
-    private Long productPrice;
-    private String couponId;
-    private String couponKind;
-    private String couponUseYn;
-
-    @PostPersist
-    public void onPostPersist(){
-    	
-         Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    	
-        OrderPlaced orderPlaced = new OrderPlaced();
-        BeanUtils.copyProperties(this, orderPlaced);
-        orderPlaced.publishAfterCommit();
-        System.out.println("\n\n##### OrderService : onPostPersist()" + "\n\n");
-        System.out.println("\n\n##### orderplace : "+orderPlaced.toJson() + "\n\n");
-        System.out.println("\n\n##### productid : "+this.productId + "\n\n");
-        logger.debug("OrderService");
-    }
-
-    @PostUpdate
-    public void onPostUpdate() {
-    	
-    	OrderCanceled orderCanceled = new OrderCanceled();
-        BeanUtils.copyProperties(this, orderCanceled);
-        orderCanceled.publishAfterCommit();
-    }
-    
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    
-....생략 
-
-```
-
-Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 하였고 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
-
-OrderRepository.java
-
-```
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-public interface OrderRepository extends PagingAndSortingRepository<Order, Long>{
-	
-}
-```
-
-배송팀의 StockDelivery.java
-
-```
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-```
-```
-@Entity
-@Table(name="StockDelivery_table")
-public class StockDelivery {
-
-     //Distance 삭제 및 Id auto로 변경
-    
-    private Long orderId;
-    private String orderStatus;
-    private String userName;
-    private String address;
-    private String productId;
-    private Integer qty;
-    private String storeName;
-    private Date orderDate;
-    private Date confirmDate;
-    private String productName;
-    private String phoneNo;
-    private Long productPrice;
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
-    private String customerId;
-    private String deliveryStatus;
-    private Date deliveryDate;
-    private String userId;
-    
-    private static final String DELIVERY_STARTED = "delivery Started";
-    private static final String DELIVERY_CANCELED = "delivery Canceled";
-... 생략 
-```
-
-마케팅의 promote.java 
-
-``` 
-@Entity
-@Table(name="Promote_table")
-public class Promote {
-
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
-    private String phoneNo;
-    private String username;
-    private Long orderId;
-    private String orderStatus;
-    private String productId;
-    private String payStatus;
-    private String couponId;
-    private String couponKind;
-    private String couponUseYn;
-    private String userId;
-
-    @PostPersist
-    public void onPostPersist(){
-        CouponPublished couponPublished = new CouponPublished();
-        BeanUtils.copyProperties(this, couponPublished);
-        couponPublished.publishAfterCommit();
-
-    }
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getPhoneNo() {
-		return phoneNo;
-	}
-.... 생략 
-
-```
-
-PromoteRepository.java
-
-```
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-public interface PromoteRepository extends PagingAndSortingRepository<Promote, Long>{
-
-	List<Promote> findByOrderId(Long orderId);
-
-}
-```
 메시지의 message.java 
 
 ``` 
@@ -495,6 +322,8 @@ public class Message {
 
 ```
 
+Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 하였고 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
+
 MessageRepository.java
 
 ```
@@ -509,8 +338,6 @@ public interface MessageRepository extends PagingAndSortingRepository<Message, L
 }
 ```
 
-- 분석단계에서의 유비쿼터스 랭귀지 (업무현장에서 쓰는 용어) 를 사용하여 소스코드가 서술되었는가?
-가능한 현업에서 사용하는 언어를 모델링 및 구현시 그대로 사용하려고 노력하였다. 
 
 - 적용 후 Rest API의 테스트
 

@@ -955,7 +955,7 @@ siege 결과 무정지 배포가 실행됨을 확인했다
 
 ![image](https://user-images.githubusercontent.com/60597727/135560327-22f9f553-253f-4827-8d6a-3df0924526ca.png)
 
-- 잘못된 경로와 포트여서 자동으로 Pod가 다시 띄워졌고 서비스는 계속 정상적으로 동작중이다
+- 배포된 yml로 Pod가 다시 띄우려 시도했지만 잘못된 경로/포트로 인해 복구되어 기존 Pod서비스로 계속 정상 동작중이다
 
 ![image](https://user-images.githubusercontent.com/60597727/135560180-dc36d217-f3e0-4239-b4c9-2e1f2a63a599.png)
 

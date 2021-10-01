@@ -955,9 +955,9 @@ siege 결과 무정지 배포가 실행됨을 확인했다
 
 ![image](https://user-images.githubusercontent.com/60597727/135560327-22f9f553-253f-4827-8d6a-3df0924526ca.png)
 
-- 배포된 yml로 Pod가 다시 띄우려 시도했지만 잘못된 경로/포트로 인해 복구되어 기존 Pod서비스로 계속 정상 동작중이다
+- 배포된 yml 잘못된 경로/포트정보로 인해 정상적이지 않다고 판단해 kubelet이 컨테이너를 자동 재시작 시도 중임을 확인 할수 있다
 
-![image](https://user-images.githubusercontent.com/60597727/135560180-dc36d217-f3e0-4239-b4c9-2e1f2a63a599.png)
+![image](https://user-images.githubusercontent.com/60597727/135570478-54d38621-5737-4f6d-9e5d-9725571e34ba.png)
 
 
 

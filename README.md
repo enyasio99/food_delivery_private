@@ -1081,74 +1081,37 @@ spec:
 ![image](https://user-images.githubusercontent.com/60597727/135547865-8b4828c0-aa4a-4190-b13e-05fb23de8452.png)
 
 
-# 동기식 호출 / Circuit Breaker / 장애격리
-오더 요청이 과도할 경우 서킷 브레이크를 통해 장애 격리를 하려고 한다.
-
-- 부하테스터 siege툴을 통한 Circuit Breaker 동작 확인 : 
-- 동시사용자 50명
-- 30초간 실시
-- marketing 서비스의 req/res 호출 후 저장전 sleep 을 진행한다.
-
-```
-siege -c50 -t30S -r10 -v --content-type "application/json" 'http://localhost:8081/stockDeliveries POST {"orderId": 1, "orderStatus": "test", "userName": "test", "qty": 10, "deliveryStatus": "delivery Started"}'
-```
-
-
-![ciruit1](https://user-images.githubusercontent.com/88864433/133549822-19fa0ac7-6876-4b76-b2fb-9d64e0feace3.PNG)
-
-![circuit2](https://user-images.githubusercontent.com/88864433/133549882-3b653f1e-6c84-4abb-b073-b5cca21ddda2.PNG)
-
-![circuit3](https://user-images.githubusercontent.com/88864433/133549892-99e332ac-18fe-4b4e-9737-b4341b66985f.PNG)
-
-![circuit4](https://user-images.githubusercontent.com/88864433/133550076-1789913a-d545-4c18-9fc3-3afe0e03c8e2.PNG)
-
-![circuit5](https://user-images.githubusercontent.com/88864433/133550122-22b8de48-faeb-4079-8bcf-9d6b48f5a457.PNG)
-
-
+# Circuit Breaker / 장애격리
+포기
 
 # Autoscale(HPA)
-앞서 CB 는 시스템을 안정되게 운영할 수 있게 해줬지만 사용자의 요청을 100% 받아들여주지 못했기 때문에 이에 대한 보완책으로 자동화된 확장 기능을 적용하고자 한다.
-
-
-![hpa1](https://user-images.githubusercontent.com/88864433/133547537-2a3d5954-305b-443e-9f06-ecd0913fdc1a.PNG)
-
-평소에 order pod이 정상적으로 존재하던 중에
-
-![hpa2](https://user-images.githubusercontent.com/88864433/133547635-04bbab9e-8373-4e40-94b2-6b23cadab2bb.PNG)
-
-Autoscale 설정 명령어 실행
-
-![hpa3](https://user-images.githubusercontent.com/88864433/133547683-607efd3d-b1a4-47fc-b3a2-3c19700de609.PNG)
-
-Autoscale 설정됨을 확인
-
-![hpa4](https://user-images.githubusercontent.com/88864433/133547727-9e4fb0bd-cbc9-45d5-ab08-606088272f7c.PNG)
-
-siege 명령어를 수행 
-
-![hpa5](https://user-images.githubusercontent.com/88864433/133547764-705a846d-c211-44b5-ae1f-bbb683fce886.PNG)
-
-CPU 사용량이 5% 이상인 경우 POD는 최대 10개까지 늘어나는 것을 확인
-
-![hpa6](https://user-images.githubusercontent.com/88864433/133547800-ea2c92cc-7733-4605-b58f-bc408a5c635b.PNG)
-
-siege 가용성은 100%을 유지하고 있다.
+포기
 
 
 # Zero-downtime deploy (Readiness Probe) 
-(무정지 배포) 
+서비스의 무정지 배포를 위하여 메시지(Message) 서비스의 v1 배포 yaml 파일에 readinessProbe 옵션을 추가하였다.
 
-서비스의 무정지 배포를 위하여 오더(Order) 서비스의 배포 yaml 파일에 readinessProbe 옵션을 추가하였다.
+```
+    spec:
+      containers:
+        - name: message
+          image: 879772956301.dkr.ecr.ap-southeast-1.amazonaws.com/message:v1
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 10
+```
+v1적용된 상태에서 siege로 요청을 발생시키는 중에 v2로 배포를 진행했다 
+![image](https://user-images.githubusercontent.com/60597727/135559211-e441c02e-b93f-49c6-b7b8-1ee5ad8b0081.png)
 
-![HPA8](https://user-images.githubusercontent.com/88864433/133559651-9169b961-c0f8-47db-b8df-8b3c274bbd91.PNG)
-
-![readness1](https://user-images.githubusercontent.com/88864433/133539552-06cc7425-1cb5-4319-b92b-c7c20d807c69.PNG)
-
-파일의 버전이 v1을 적용하고 siege를 실행한 상태에서 v2로 배포를 진행하였다. 
-
-![readness2](https://user-images.githubusercontent.com/88864433/133539593-37ea6cf1-ce76-4d5e-bf21-b6f3ec85079c.PNG)
-
-서비스의 끊김없이 무정지 배포가 실행됨을 확인하였다. 
+siege 결과 무정지 배포가 실행됨을 확인했다 
+![image](https://user-images.githubusercontent.com/60597727/135559279-6e707e54-df7a-4e26-a88c-f21e03973f25.png)
 
 
 # Self-healing (Liveness Probe)

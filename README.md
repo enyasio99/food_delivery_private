@@ -443,30 +443,112 @@ public interface PromoteRepository extends PagingAndSortingRepository<Promote, L
 
 }
 ```
+메시지의 message.java 
+
+``` 
+@Entity
+@Table(name="Message_table")
+public class Message {
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Long id;
+    private Long orderId;
+    private String productId;
+    private String productName;
+    private String userName;
+    private String messageStatus;
+    private String phoneNo;
+
+
+    @PrePersist
+    public void onPrePersist(){
+
+        try {
+            Thread.currentThread().sleep((long) (400 + Math.random() * 220));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    @PostUpdate
+    public void onPostUpdate(){
+        MessageCanceled messageCanceled = new MessageCanceled();
+        BeanUtils.copyProperties(this, messageCanceled);
+        messageCanceled.publishAfterCommit();
+        System.out.println("\n\n message onPostUpdate() \n\n");
+    }
+
+
+
+        public Long getId() {
+                return id;
+        }
+
+        public void setId(Long id) {
+                this.id = id;
+        }
+.... 생략 
+
+```
+
+MessageRepository.java
+
+```
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+@RepositoryRestResource(collectionResourceRel="messages", path="messages")
+public interface MessageRepository extends PagingAndSortingRepository<Message, Long>{
+
+        List<Message> findByOrderId(Long orderId);
+
+}
+```
 
 - 분석단계에서의 유비쿼터스 랭귀지 (업무현장에서 쓰는 용어) 를 사용하여 소스코드가 서술되었는가?
 가능한 현업에서 사용하는 언어를 모델링 및 구현시 그대로 사용하려고 노력하였다. 
 
 - 적용 후 Rest API의 테스트
-주문 결제 후 productdelivery 주문 접수하기 POST
 
 ```
 [시나리오 1]
-http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address=“Seoul” productId=“1001" payStatus=“Y” phoneNo=“01011110000" productName=“Mac” productPrice=3000000 qty=1 userId=“goodman” username=“John”
-http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address=“England” productId=“2001” payStatus=“Y” phoneNo=“0102220000” productName=“gram” productPrice=9000000 qty=1 userId=“gentleman” username=“John”
-http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address=“USA” productId=“3001" payStatus=“Y” phoneNo=“01030000" productName=“Mac” productPrice=3000000 qty=1 userId=“goodman” username=“John”
-http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address=“USA” productId=“3001” payStatus=“Y” phoneNo=“01030000” productName=“Mac” productPrice=3000000 qty=1 userId=“last test” username=“last test”
+http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address="Seoul" productId="1001" payStatus="Y" phoneNo="01011110000" productName="Mac" productPrice=3000000 qty=1 userId="goodman" username="John"
+
+http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address="England" productId="2001" payStatus="Y" phoneNo="0102220000" productName="gram" productPrice=9000000 qty=1 userId="gentleman" username="John"
+
+http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address="USA" productId="3001" payStatus="Y" phoneNo="01030000" productName="Mac" productPrice=3000000 qty=1 userId="goodman" username="John"
+
+http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address="USA" productId="3001" payStatus="Y" phoneNo="01030000" productName="Mac" productPrice=3000000 qty=1 userId="last test" username="last test"
+
 [시나리오 2]
-http PATCH http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders/1 orderStatus=“Order Canceled”
-http PATCH http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders/3 orderStatus=“Order Canceled”
-http PATCH http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders/5 orderStatus=“Order Canceled”
+http PATCH http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders/1 orderStatus="Order Canceled"
+
+http PATCH http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com/orders/3 orderStatus="Order Canceled"
+
+http PATCH http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders/5 orderStatus="Order Canceled"
+
 [체크]
 http GET http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders
+
 http GET http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orderStatus
+
 http GET http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/stockDeliveries
+
 http GET http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/promotes
+
 http GET http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/messages
 ```
+- 각 단계별 테스트 결과
+![image](https://user-images.githubusercontent.com/60597727/135551829-ab5e7b8b-4ee4-478d-8c61-df05be3052c1.png)
+![image](https://user-images.githubusercontent.com/60597727/135551876-9798657b-ff89-4296-b8fa-bc56bbd24519.png)
+![image](https://user-images.githubusercontent.com/60597727/135551910-66428ce4-b44e-4dfb-8f61-cc26b24cf63e.png)
+![image](https://user-images.githubusercontent.com/60597727/135551728-122c6b84-617d-49a6-ac93-042b72e548ba.png)
+![image](https://user-images.githubusercontent.com/60597727/135551939-0da4aee0-4253-49c5-b29d-3c3d6cb5a190.png)
+![image](https://user-images.githubusercontent.com/60597727/135551971-08cdd773-22d7-47dd-871a-8037519f7f41.png)
 
 
 # 동기식 호출과 Fallback 처리
@@ -477,92 +559,92 @@ http GET http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.am
 
 요구사항대로 배송팀에서는 쿠폰이 발행된 것을 확인한 후에 배송을 시작한다.
 
-StockDelivery.java Entity Class에 @PostPersist로 쿠폰 발행 후에 배송을 시작하도록 처리하였다.
+StockDelivery.java Entity Class에 @PostUpdate로 쿠폰 취소와 취소문자 발송이 완료되었을 경우 배송을 취소하도록 동기식 처리하였다.
 
 ```
-    @PostPersist
-    public void onPostPersist() throws Exception{
+       @PostUpdate
+    public void onPostUpdate(){
+       // DeliveryCompleted deliveryCompleted = new DeliveryCompleted();
+       // BeanUtils.copyProperties(this, deliveryCompleted);
+       // deliveryCompleted.publishAfterCommit();
+        Promote promote = new Promote();
+        Message message = new Message();
 
-    	Promote promote = new Promote();
-        promote.setPhoneNo(this.phoneNo); 
-        promote.setUserId(this.userId); 
-        promote.setUsername(this.userName); 
-        promote.setOrderId(this.orderId); 
-        promote.setOrderStatus(this.orderStatus); 
-        promote.setProductId(this.productId); 
-        System.out.println("\n\npostpersist() : "+this.deliveryStatus +"\n\n");
-        // deliveryStatus 따라 로직 분기
-        if(DELIVERY_STARTED == this.deliveryStatus){
-        	
-	        boolean result = (boolean) ProductdeliveryApplication.applicationContext.getBean(food.delivery.work.external.PromoteService.class).publishCoupon(promote);
-	
-	        if(result){
-	        	System.out.println("----------------");
-	            System.out.println("Coupon Published");
-	            System.out.println("----------------");
-		       	DeliveryStarted deliveryStarted = new DeliveryStarted();
-		        BeanUtils.copyProperties(this, deliveryStarted);
-		        deliveryStarted.publishAfterCommit();
-	        }else {
-	        	throw new RollbackException("Failed during coupon publish");
-	        }
-        
+        promote.setPhoneNo(this.phoneNo);
+        promote.setUserId(this.userId);
+        promote.setUsername(this.userName);
+        promote.setOrderId(this.orderId);
+        promote.setOrderStatus(this.orderStatus);
+        promote.setProductId(this.productId);
+
+        message.setPhoneNo(this.phoneNo);
+        message.setUsername(this.userName);
+        message.setOrderId(this.orderId);
+        message.setProductName(this.productName);
+        message.setProductId(this.productId);
+
+        if(DELIVERY_CANCELED == this.deliveryStatus) {
+
+                boolean result = (boolean) ProductdeliveryApplication.applicationContext.getBean(food.delivery.work.external.PromoteService.class).cancelCoupon(promote);
+                boolean result2 = (boolean) ProductdeliveryApplication.applicationContext.getBean(food.delivery.work.external.MessageService.class).cancelMessage(message);
+
+                if(result && result2){
+                        System.out.println("----------------");
+                    System.out.println("Coupon Canceled && Message Canceled");
+                    System.out.println("----------------");
+                        DeliveryCanceled deliveryCanceled = new DeliveryCanceled();
+                        BeanUtils.copyProperties(this, deliveryCanceled);
+                        deliveryCanceled.publishAfterCommit();
+                }else {
+                        throw new RollbackException("Failed during coupon cancel or message cancel");
+                }
+
         }
-  
     }
     
 ```
 
-##### 동기식 호출은 PromoteService 클래스를 두어 FeignClient 를 이용하여 호출하도록 하였다.
+##### 동기식 호출은 MessageService 클래스를 두어 FeignClient 를 이용하여 호출하도록 하였다.
 
-- PromoteService.java
+- MessageService.java
 
 ```
-  
 package food.delivery.work.external;
-
+  
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import food.delivery.work.Promote;
+import food.delivery.work.Message;
 
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name="marketing", url = "${api.promote.url}", fallback = PromoteServiceFallback.class)
-public interface PromoteService {
-  
-    @RequestMapping(method=RequestMethod.POST, path="/createPromoteInfo")
-    public boolean publishCoupon(@RequestBody Promote promote);
-    
-    @RequestMapping(method=RequestMethod.POST, path="/cancelCoupon")
-    public boolean cancelCoupon(@RequestBody Promote promote);
+@FeignClient(name="message", url = "${api.message.url}", fallback = MessageServiceFallback.class)
+public interface MessageService {
+
+    @RequestMapping(method=RequestMethod.POST, path="/createMessageInfo")
+    public boolean publishCoupon(@RequestBody Message promote);
+
+    @RequestMapping(method=RequestMethod.POST, path="/cancelMessage")
+    public boolean cancelMessage(@RequestBody Message message);
 }
 ```
 
 - PromoteServiceFallback.java
 
 ```
-  
 package food.delivery.work.external;
-
+  
 import org.springframework.stereotype.Component;
 
-import food.delivery.work.Promote;
+import food.delivery.work.Message;
 
 @Component
-public class PromoteServiceFallback implements PromoteService {
-    @Override
-    public boolean publishCoupon(Promote promote) {
-        //do nothing if you want to forgive it
+public class MessageServiceFallback implements MessageService {
 
-        System.out.println("Circuit breaker has been opened. Fallback returned instead.");
-        return false;
-    }
-    
     @Override
-    public boolean cancelCoupon(Promote promote) {
+    public boolean cancelMessage(Message message) {
         //do nothing if you want to forgive it
 
         System.out.println("Circuit breaker has been opened. Fallback returned instead.");
@@ -572,86 +654,47 @@ public class PromoteServiceFallback implements PromoteService {
 ```
 
 
-# 비동기식 호출과 Eventual Consistency (작성완료)
+# 비동기식 호출과 Eventual Consistency
 
 (이벤트 드리븐 아키텍처)
 
 - 카프카를 이용하여 PubSub 으로 하나 이상의 서비스가 연동되었는가?
 
-주문/주문취소 후에 이를 배송팀에 알려주는 트랜잭션은 Pub/Sub 관계로 구현하였다.
-아래는 주문/주문취소 이벤트를 통해 kafka를 통해 배송팀 서비스에 연계받는 코드 내용이다. 
+- 메시지팀에서 배송시작 이벤트에 대해 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler를 구현했다
 
 ```
-
-    @PostPersist
-    public void onPostPersist(){
-    	
-         Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    	
-        OrderPlaced orderPlaced = new OrderPlaced();
-        BeanUtils.copyProperties(this, orderPlaced);
-        orderPlaced.publishAfterCommit();
-        System.out.println("\n\n##### OrderService : onPostPersist()" + "\n\n");
-        System.out.println("\n\n##### orderplace : "+orderPlaced.toJson() + "\n\n");
-        System.out.println("\n\n##### productid : "+this.productId + "\n\n");
-        logger.debug("OrderService");
-    }
-
-    @PostUpdate
-    public void onPostUpdate() {
-    	
-    	OrderCanceled orderCanceled = new OrderCanceled();
-        BeanUtils.copyProperties(this, orderCanceled);
-        orderCanceled.publishAfterCommit();
-    }
-```
-- 배송팀에서는 주문/주문취소 접수 이벤트에 대해 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler를 구현한다. 
-
-```
-Service
+@Service
 public class PolicyHandler{
-    @Autowired StockDeliveryRepository stockDeliveryRepository;
+    @Autowired MessageRepository MessageRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverOrderPlaced_AcceptOrder(@Payload OrderPlaced orderPlaced){
+    public void wheneverDeliveryStarted_SendMessage(@Payload DeliveryStarted deliveryStarted){
 
-        if(!orderPlaced.validate()) return;
+        Logger logger = LoggerFactory.getLogger(this.getClass());
+
+        logger.debug("@@@@@@@Send Message Start");
+
+        if(!deliveryStarted.validate()) return;
 
         // delivery 객체 생성 //
-         StockDelivery delivery = new StockDelivery();
+         Message message = new Message();
 
-         delivery.setOrderId(orderPlaced.getId());
-         delivery.setUserId(orderPlaced.getUserId());
-         delivery.setOrderDate(orderPlaced.getOrderDate());
-         delivery.setPhoneNo(orderPlaced.getPhoneNo());
-         delivery.setProductId(orderPlaced.getProductId());
-         delivery.setQty(orderPlaced.getQty()); 
-         delivery.setDeliveryStatus("delivery Started");
+         message.setOrderId(deliveryStarted.getOrderId());
+         message.setUserName(deliveryStarted.getUserName());
+         message.setPhoneNo(deliveryStarted.getPhoneNo());
+         message.setProductId(deliveryStarted.getProductId());
+         message.setProductName(deliveryStarted.getProductName());
+         message.setMessageStatus("Message Sended");
 
          System.out.println("==================================");
-         System.out.println(orderPlaced.getId());
-         System.out.println(orderPlaced.toJson());
+         System.out.println(deliveryStarted.getId());
+         System.out.println(deliveryStarted.toJson());
          System.out.println("==================================");
-         System.out.println(delivery.getOrderId());
+         System.out.println(deliveryStarted.getOrderId());
 
-         stockDeliveryRepository.save(delivery);
+         MessageRepository.save(message);
 
-    }
-    
-    @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverOrderCanceled_CancleOrder(@Payload OrderCanceled orderCanceled) {
-    	
-    	if(!orderCanceled.validate()) return;
-... 중략
-        for (StockDelivery delivery:deliveryList)
-        {
-        	System.out.println("\n\n"+orderCanceled.getId());
-            delivery.setDeliveryStatus("delivery Canceled");
-            stockDeliveryRepository.save(delivery);
-        }
-     
-    }
+         logger.debug("@@@@@@@Send Message END");
 
 }
 ```
@@ -660,108 +703,81 @@ public class PolicyHandler{
 # SAGA 패턴
 - 취소에 따른 보상 트랜잭션을 설계하였는가?(Saga Pattern)
 
-상품배송팀의 기능을 수행할 수 없더라도 주문은 항상 받을 수 있게끔 설계하였다. 
-다만 데이터의 원자성을 보장해주지 않기 때문에 추후 order service 에서 재고 정보를 확인한 이후에 주문수락을 진행하거나, 상품배송 서비스에서 데이터 변경전 재고 여부를 확인하여 롤백 이벤트를 보내는 로직이 필요할 것으로 판단된다. 
+주문이후 delivery 서비스가 배송이 시작될때
+[delivery 서비스]
+delivery aggegate의 값들을 저장한 후 배송시작됨(deliveryStarted) 이벤트를 발행한다. - 첫번째 트랜잭션 완료
+```
+    @PostPersist
+    public void onPostPersist() throws Exception{
 
+        Promote promote = new Promote();
+        promote.setPhoneNo(this.phoneNo);
+        promote.setUserId(this.userId);
+        promote.setUsername(this.userName);
+        promote.setOrderId(this.orderId);
+        promote.setOrderStatus(this.orderStatus);
+        promote.setProductId(this.productId);
+        System.out.println("\n\npostpersist() : "+this.deliveryStatus +"\n\n");
+        // deliveryStatus 따라 로직 분기
+        if(DELIVERY_STARTED == this.deliveryStatus){
 
-order 서비스가  고객으로 주문 및 결제(order and pay) 요청을 받고
-[order 서비스]
-Order aggegate의 값들을 추가한 이후 주문완료됨(OrderPlaced) 이벤트를 발행한다. - 첫번째 
+                boolean result = (boolean) ProductdeliveryApplication.applicationContext.getBean(food.delivery.work.external.PromoteService.class).publishCoupon(promote);
 
-![saga1](https://user-images.githubusercontent.com/88864433/133546289-8b2cf493-7296-4464-944a-1c112f77b500.PNG)
+                if(result){
+                        System.out.println("----------------");
+                    System.out.println("Coupon Published");
+                    System.out.println("----------------");
+                        DeliveryStarted deliveryStarted = new DeliveryStarted();
+                        BeanUtils.copyProperties(this, deliveryStarted);
+                        deliveryStarted.publishAfterCommit();
+                }else {
+                        throw new RollbackException("Failed during coupon publish");
+                }
 
-서비스의 트랜젝션 완료
+        }
 
-[product delivery 서비스]
+    }
+```
 
-![saga2](https://user-images.githubusercontent.com/88864433/133546388-3d5da7c0-8609-4a5b-8143-270b761a7a54.PNG)
+[message 서비스]
 
-주문완료됨(OrderPlaced) 이벤트가 발행되면 상품배송 서비스에서 해당 이벤트를 확인한다.
-재고배송(stockdelivery) 정보를 추가 한다. - 두번째 서비스의 트렌젝션 완료
+배송시작됨(DeliveryStarted) 이벤트가 발행되면 메시지 서비스에서 해당 이벤트를 확인하고
+메시지 상태정보를 저장한다. - 두번째 서비스의 트렌잭션 완료
+```
+ @StreamListener(KafkaProcessor.INPUT)
+    public void wheneverDeliveryStarted_SendMessage(@Payload DeliveryStarted deliveryStarted){
 
-![saga3](https://user-images.githubusercontent.com/88864433/133546519-f224c831-4a34-4360-bd79-23a5f077949e.PNG)
+        Logger logger = LoggerFactory.getLogger(this.getClass());
 
+        logger.debug("@@@@@@@Send Message Start");
 
+        if(!deliveryStarted.validate()) return;
+
+        // delivery 객체 생성 //
+         Message message = new Message();
+
+         message.setOrderId(deliveryStarted.getOrderId());
+         message.setUserName(deliveryStarted.getUserName());
+         message.setPhoneNo(deliveryStarted.getPhoneNo());
+         message.setProductId(deliveryStarted.getProductId());
+         message.setProductName(deliveryStarted.getProductName());
+         message.setMessageStatus("Message Sended");
+
+         System.out.println("==================================");
+         System.out.println(deliveryStarted.getId());
+         System.out.println(deliveryStarted.toJson());
+         System.out.println("==================================");
+         System.out.println(deliveryStarted.getOrderId());
+
+         MessageRepository.save(message);
+
+         logger.debug("@@@@@@@Send Message END");
+```
 
 # CQRS
 - CQRS: Materialized View 를 구현하여, 타 마이크로서비스의 데이터 원본에 접근없이(Composite 서비스나 조인SQL 등 없이) 도 내 서비스의 화면 구성과 잦은 조회가 가능한가?
 
-주문/배송상태가 바뀔 때마다 고객이 현재 상태를 확인할 수 있어야 한다는 요구사항에 따라 주문 서비스 내에 OrderStatus View를 모델링하였다
-
-OrderStatus.java 
-```
-@Entity
-@Table(name="OrderStatus_table")
-public class OrderStatus {
-
-        @Id
-        @GeneratedValue(strategy=GenerationType.AUTO)
-        private Long id;
-        private String username;
-        private String userId;
-        private Long orderId;
-        private String orderStatus;
-        private String productId;
-        private String productName;
-        private Long productPrice;
-        private int qty; 
-        private String couponId;
-        private String couponKind;
-        private String couponUseYn;
-.... 생략 
-```
-
-OrderStatusViewHandler 를 통해 구현
-
-Pub/Sub 기반으로 별도 ProductPage_table 테이블에 저장되도록 구현하였다.
-
-```
-@Service
-public class OrderStatusViewHandler {
-
-
-    @Autowired
-    private OrderStatusRepository orderStatusRepository;
-    
-    @StreamListener(KafkaProcessor.INPUT)
-    public void whenOrderPlaced_then_CREATE_1 (@Payload OrderPlaced orderPlaced) {
-        try {
-
-            if (!orderPlaced.validate()) return;
-
-            // view 객체 생성
-            OrderStatus orderStatus = new OrderStatus();
-            orderStatus.setUsername(orderPlaced.getUsername());
-            orderStatus.setUserId(orderPlaced.getUserId());
-            orderStatus.setOrderId(orderPlaced.getId());
-            orderStatus.setOrderStatus("OrderPlaced");
-            orderStatus.setProductId(orderPlaced.getProductId());
-            orderStatus.setProductName(orderPlaced.getProductName());
-            orderStatus.setProductPrice(orderPlaced.getProductPrice());
-            orderStatus.setQty(orderPlaced.getQty());
-           
-            orderStatusRepository.save(orderStatus);
-            
-            System.out.println("\n\n##### OrderStatus : whenOrderPlaced_then_CREATE_1" + "\n\n");
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-```
-
-주문에 대한 결제완료(PayStatus) 시 orderId를 키값으로 OrderStatus 데이터도 생성되며 (주문과 결제를 동시에 처리했을 때 배송을 시작하므로)
-
-"결제완료(주문완료), 주문접수, 배송시작, 결제취소(주문취소)"의 이벤트에 따라 주문상태가 업데이트되도록 모델링하였다.
-
-
-
-
-- CQRS 테스트 
-
-![CQRS](https://user-images.githubusercontent.com/88864433/133558737-0d82429e-add2-403b-9750-c1a723beeb86.PNG)
-
-
+메시지 상태를 고객이 확인 할 필요는 없어 추가하지 않았다
 
 
 # 폴리글랏 퍼시스턴스

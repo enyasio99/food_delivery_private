@@ -601,7 +601,7 @@ delivery aggegate의 값들을 저장한 후 배송시작됨(deliveryStarted) �
 # CQRS
 - CQRS: Materialized View 를 구현하여, 타 마이크로서비스의 데이터 원본에 접근없이(Composite 서비스나 조인SQL 등 없이) 도 내 서비스의 화면 구성과 잦은 조회가 가능한가?
 
-메시지 상태를 고객이 확인 할 필요는 없어 추가하지 않았다
+알림 메시지 상태를 고객이 확인 할 필요가 없어 추가구현하지 않음
 
 
 # 폴리글랏 퍼시스턴스

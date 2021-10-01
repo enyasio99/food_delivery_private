@@ -450,9 +450,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name="message", url = "${api.message.url}", fallback = MessageServiceFallback.class)
 public interface MessageService {
 
-    @RequestMapping(method=RequestMethod.POST, path="/createMessageInfo")
-    public boolean publishCoupon(@RequestBody Message promote);
-
     @RequestMapping(method=RequestMethod.POST, path="/cancelMessage")
     public boolean cancelMessage(@RequestBody Message message);
 }

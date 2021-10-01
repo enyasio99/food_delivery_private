@@ -1118,19 +1118,22 @@ siege 결과 무정지 배포가 실행됨을 확인했다
 
 - port 및 정보를 잘못된 값으로 변경하여 yml 적용
 
-![liveness1](https://user-images.githubusercontent.com/88864433/133550800-5c481182-5e46-4572-b5c8-738fe5356653.PNG)
+```
+          livenessProbe:
+            httpGet:
+              path: '/actuator/failed'
+              port: 9999 
+            initialDelaySeconds: 120
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 5
+```
 
-- 해당 yml을 배포
+![image](https://user-images.githubusercontent.com/60597727/135560327-22f9f553-253f-4827-8d6a-3df0924526ca.png)
 
-![liveness2](https://user-images.githubusercontent.com/88864433/133550866-21e9ca23-9d2c-41a0-bc60-0f6a7596279f.PNG)
+- 잘못된 경로와 포트여서 자동으로 Pod가 다시 띄워졌고 서비스는 계속 정상적으로 동작중이다
 
-- 잘못된 경로와 포트여서 kubelet이 자동으로 컨테이너를 재시작하였다. 
-
-![LIVENESS4](https://user-images.githubusercontent.com/88864433/133563189-377ef1fe-7e86-4ea6-b387-87739edcdf61.PNG)
-
-- POD가 재시작되었다. 
-
-![liveness3](https://user-images.githubusercontent.com/88864433/133550970-0f13cf46-7b96-4034-aeaa-c24750597973.PNG)
+![image](https://user-images.githubusercontent.com/60597727/135560180-dc36d217-f3e0-4239-b4c9-2e1f2a63a599.png)
 
 
 

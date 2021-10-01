@@ -236,7 +236,7 @@ https://www.msaez.io/#/storming/0MMWUdqHaeZClTr5NOawTiqn8rp1/4c0d2945840662a28cf
 5. [설계/구현/운영]circuit breaker : 배송 취소가 임계치 이상 발생할 경우 Circuit Breaker 가 발동된다. 
 ``` 
 
-### 헥사고날 아키텍처 다이어그램 도출 (그림 수정필요없는지 확인 필요)
+### 헥사고날 아키텍처 다이어그램 도출
 
 ![13](https://user-images.githubusercontent.com/60597727/135475246-5d3cbc7e-83a8-49c1-8ed0-93536642ebee.png)
  

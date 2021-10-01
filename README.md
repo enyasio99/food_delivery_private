@@ -452,19 +452,20 @@ public interface PromoteRepository extends PagingAndSortingRepository<Promote, L
 
 ```
 [시나리오 1]
-http POST http://aedb7e1cae2d84953b471cb6b57ed58f-1249713815.ap-southeast-1.elb.amazonaws.com:8080/orders address=“Seoul” productId=“1001" payStatus=“Y” phoneNo=“01011110000" productName=“Mac” productPrice=3000000 qty=1 userId=“goodman” username=“John”
-http POST http://aedb7e1cae2d84953b471cb6b57ed58f-1249713815.ap-southeast-1.elb.amazonaws.com:8080/orders address=“England” productId=“2001” payStatus=“Y” phoneNo=“0102220000” productName=“gram” productPrice=9000000 qty=1 userId=“gentleman” username=“John”
-http POST http://aedb7e1cae2d84953b471cb6b57ed58f-1249713815.ap-southeast-1.elb.amazonaws.com:8080/orders address=“USA” productId=“3001" payStatus=“Y” phoneNo=“01030000" productName=“Mac” productPrice=3000000 qty=1 userId=“goodman” username=“John”
-http POST http://aedb7e1cae2d84953b471cb6b57ed58f-1249713815.ap-southeast-1.elb.amazonaws.com:8080/orders address=“USA” productId=“3001” payStatus=“Y” phoneNo=“01030000” productName=“Mac” productPrice=3000000 qty=1 userId=“last test” username=“last test”
+http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address=“Seoul” productId=“1001" payStatus=“Y” phoneNo=“01011110000" productName=“Mac” productPrice=3000000 qty=1 userId=“goodman” username=“John”
+http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address=“England” productId=“2001” payStatus=“Y” phoneNo=“0102220000” productName=“gram” productPrice=9000000 qty=1 userId=“gentleman” username=“John”
+http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address=“USA” productId=“3001" payStatus=“Y” phoneNo=“01030000" productName=“Mac” productPrice=3000000 qty=1 userId=“goodman” username=“John”
+http POST http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders address=“USA” productId=“3001” payStatus=“Y” phoneNo=“01030000” productName=“Mac” productPrice=3000000 qty=1 userId=“last test” username=“last test”
 [시나리오 2]
-http PATCH http://aedb7e1cae2d84953b471cb6b57ed58f-1249713815.ap-southeast-1.elb.amazonaws.com:8080/orders/1 orderStatus=“Order Canceled”
-http PATCH http://aedb7e1cae2d84953b471cb6b57ed58f-1249713815.ap-southeast-1.elb.amazonaws.com:8080/orders/3 orderStatus=“Order Canceled”
-http PATCH http://aedb7e1cae2d84953b471cb6b57ed58f-1249713815.ap-southeast-1.elb.amazonaws.com:8080/orders/5 orderStatus=“Order Canceled”
+http PATCH http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders/1 orderStatus=“Order Canceled”
+http PATCH http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders/3 orderStatus=“Order Canceled”
+http PATCH http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders/5 orderStatus=“Order Canceled”
 [체크]
-http GET http://aedb7e1cae2d84953b471cb6b57ed58f-1249713815.ap-southeast-1.elb.amazonaws.com:8080/orders
-http GET http://aedb7e1cae2d84953b471cb6b57ed58f-1249713815.ap-southeast-1.elb.amazonaws.com:8080/orderStatus
-http GET http://aedb7e1cae2d84953b471cb6b57ed58f-1249713815.ap-southeast-1.elb.amazonaws.com:8080/stockDeliveries
-http GET http://aedb7e1cae2d84953b471cb6b57ed58f-1249713815.ap-southeast-1.elb.amazonaws.com:8080/promotes
+http GET http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orders
+http GET http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/orderStatus
+http GET http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/stockDeliveries
+http GET http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/promotes
+http GET http://aee92aad2d1f949e3a1936b1e64bd1c3-150534453.ap-southeast-1.elb.amazonaws.com:8080/messages
 ```
 
 

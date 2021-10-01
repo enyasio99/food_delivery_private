@@ -861,68 +861,208 @@ server:
 --
 # Deploy/Pipeline
 
-- (CI/CD 설정) BuildSpec.yml 사용 각 MSA 구현물은 git의 source repository 에 구성되었고, AWS의 CodeBuild를 활용하여 무정지 CI/CD를 설정하였다.
-
-- Repository 화면 캡쳐 
-
-![CICD](https://user-images.githubusercontent.com/88864433/133468925-a9ba1fec-8331-4a68-a0b7-2b570e4182de.PNG)
-
-- CodeBuild 설정
-
-![CODEBUILD1](https://user-images.githubusercontent.com/88864433/133469657-2b250c1e-777d-4d18-8ae9-c631ba9fa9f6.PNG)
-
-
-![codebuild2](https://user-images.githubusercontent.com/88864433/133469760-d091efc6-5d09-4c25-a324-337f0b5e0d87.PNG)
-
-- 빌드 환경 설정 
-환경변수(KUBE_URL, KUBE_TOKEN, repository 등 설정) 
-
-![codebuild_환경변수](https://user-images.githubusercontent.com/88864433/133470474-c69371cd-2ed6-49f1-adb5-8d1f7ac4d056.PNG)
-
-
-- buildspec.yml
-
+- deployment.yml파일을 통해 deploy와 service생성을 진행함
 ```
-version: 0.2
-​
-env:
-  variables:
-    IMAGE_REPO_NAME: "order"
-    CODEBUILD_RESOLVED_SOURCE_VERSION: "latest"
-​
-phases:
-  install:
-    commands:    
-      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2&
-      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
-    runtime-versions:
-      java: corretto11
-      docker: 18
-  pre_build:
-    commands:
-      - echo Logging in to Amazon ECR...
-      - echo $IMAGE_REPO_NAME
-      - echo $AWS_ACCOUNT_ID
-      - echo $AWS_DEFAULT_REGION
-      - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
-      - echo start command
-      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-  build:
-    commands:
-      - echo Build started on `date`
-      - echo Building the Docker image...
-      - mvn package -Dmaven.test.skip=true
-      - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION  .
-  post_build:
-    commands:
-      - echo Build completed on `date`
-      - echo Pushing the Docker image...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
-​
-cache:
-  paths:
-    - '/root/.m2/**/*' 
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productdelivery
+  labels:
+    app: productdelivery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productdelivery
+  template:
+    metadata:
+      labels:
+        app: productdelivery
+    spec:
+      containers:
+        - name: productdelivery
+          image: 879772956301.dkr.ecr.ap-southeast-1.amazonaws.com/productdelivery:latest
+          ports:
+            - containerPort: 8080
+...생략
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+  labels:
+    app: order
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+        - name: order
+          image: 879772956301.dkr.ecr.ap-southeast-1.amazonaws.com/order:latest
+          ports:
+            - containerPort: 8080
+...생략
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marketing
+  labels:
+    app: marketing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: marketing
+  template:
+    metadata:
+      labels:
+        app: marketing
+    spec:
+      containers:
+        - name: marketing
+          image: 879772956301.dkr.ecr.ap-southeast-1.amazonaws.com/marketing:latest
+          ports:
+            - containerPort: 8080
+...생략
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orderstatus
+  labels:
+    app: orderstatus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orderstatus
+  template:
+    metadata:
+      labels:
+        app: orderstatus
+    spec:
+      containers:
+        - name: orderstatus
+          image: 879772956301.dkr.ecr.ap-southeast-1.amazonaws.com/orderstatus:latest
+          ports:
+            - containerPort: 8080
+...생략
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: message
+  labels:
+    app: message
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: message
+  template:
+    metadata:
+      labels:
+        app: message
+    spec:
+      containers:
+        - name: message
+          image: 879772956301.dkr.ecr.ap-southeast-1.amazonaws.com/message:latest
+          ports:
+            - containerPort: 8080
+...생략
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: productdelivery
+  labels:
+    app: productdelivery
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: productdelivery
+
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+  labels:
+    app: order
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: order
+
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: marketing
+  labels:
+    app: marketing
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: marketing
+
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: orderstatus
+  labels:
+    app: orderstatus
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: orderstatus
+
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: message
+  labels:
+    app: message
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: message
 ```
+- 배포 적용 결과
+![image](https://user-images.githubusercontent.com/60597727/135547865-8b4828c0-aa4a-4190-b13e-05fb23de8452.png)
+
 
 # 동기식 호출 / Circuit Breaker / 장애격리
 오더 요청이 과도할 경우 서킷 브레이크를 통해 장애 격리를 하려고 한다.
